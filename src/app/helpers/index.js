@@ -23,7 +23,7 @@ async function saveImage(tempPath, targetPath, originalName, newName) {
         }
 
         return resolve(
-          `${process.env.APP_HOST}/uploads/${newName}${path.extname(
+          `http://${process.env.APP_HOST}:${process.env.PORT}/uploads/${newName}${path.extname(
             originalName,
           )}`,
         );
