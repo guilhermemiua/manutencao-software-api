@@ -42,9 +42,36 @@ class UserController {
 
       return response.status(201).json({ user, address });
     } catch (error) {
+
+      console.log
       return response.status(401).json({ message: 'Erro no cadastro de Usuário' });
     }
   }
+
+  async updatePushToken(request, response) {
+    try {
+      const { userId } = request
+      const {
+        push_token
+      } = request.body;
+
+      const user = await User.update(
+        {
+          push_token
+        },
+        {
+          where: {
+            id: userId,
+          },
+        },
+      );
+
+      return response.status(201).json(user);
+    } catch (error) {
+      return response.status(401).json({ message: 'Erro na atualização do push token do usuário' });
+    }
+  }
+
 
   async update(request, response) {
     try {

@@ -9,6 +9,7 @@ const {
   ProductImage,
   ProfileImage,
 } = require('../models');
+const axios = require('axios')
 
 class OrderController {
   async create(request, response) {
@@ -102,9 +103,17 @@ class OrderController {
   }
 
   async updateStatus(request, response) {
+    const transaction = await sequelize.transaction();
+
     try {
       const { id } = request.params;
-      const { status } = request.body;
+      const { status, user_id } = request.body;
+
+      const user = await User.findByPk(user_id);
+
+      if (!user) {
+        return response.status(401).json({ message: 'Usuário não encontrado' });
+      }
 
       const order = await Order.update(
         {
@@ -115,10 +124,35 @@ class OrderController {
             id: Number(id),
           },
         },
+        {
+          transaction
+        }
       );
+
+      const formatStatus = (status) => {
+        if (status === 'waiting') {
+          return 'Aguardando'
+        } else if ('status' === 'confirmed') {
+          return 'Confirmado'
+        } else if ('status' === 'cancelled') {
+          return 'Cancelado'
+        }
+      }
+
+      await axios.post('https://exp.host/--/api/v2/push/send', {
+        to: user.push_token,
+        title: "Seu pedido foi atualizado!",
+        body: `O pedido foi alterado para o status: ${formatStatus(status)}`,
+        priority: 'high',
+        channelId: 'default',
+      })
+
+      await transaction.commit();
 
       return response.status(201).json(order);
     } catch (error) {
+      await transaction.rollback();
+
       return response
         .status(401)
         .json({ message: 'Erro na atualização do status pedido' });

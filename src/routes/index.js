@@ -33,6 +33,7 @@ routes.use(authMiddleware);
 
 routes.get('/me/products', ProductController.getProductsPerCompany);
 routes.get('/me/orders', OrderController.getOrdersPerCompany);
+routes.put('/me/push-token', UserController.updatePushToken);
 
 routes.put('/user/:id', UserController.update);
 routes.get('/users/:id', UserController.findById);
