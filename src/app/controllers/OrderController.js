@@ -132,9 +132,9 @@ class OrderController {
       const formatStatus = (status) => {
         if (status === 'waiting') {
           return 'Aguardando'
-        } else if ('status' === 'confirmed') {
+        } else if (status === 'confirmed') {
           return 'Confirmado'
-        } else if ('status' === 'cancelled') {
+        } else if (status === 'cancelled') {
           return 'Cancelado'
         }
       }
@@ -151,6 +151,7 @@ class OrderController {
 
       return response.status(201).json(order);
     } catch (error) {
+      console.log(error)
       await transaction.rollback();
 
       return response
